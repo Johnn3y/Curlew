@@ -35,9 +35,12 @@ from urllib.parse import unquote
 try:
     import gi
     gi.require_version('Gtk', '3.0')
-    
-    from gi.repository import Gtk, GLib, Gdk, GObject, GdkPixbuf, Gio, Pango
-    import dbus.glib, dbus.service
+    try:
+        from gi.repository import Gtk, GLib, Gdk, GObject, GdkPixbuf, Gio, Pango
+        import dbus.glib, dbus.service
+    except ImportError as e:
+        print(e)
+        pass
     
     from modules.customwidgets import LabeledHBox, TimeLayout, HScale, \
     SpinsFrame, LabeledGrid, ComboWithEntry, ButtonWithIcon, ToggleBtnWithIcon
@@ -2811,22 +2814,21 @@ class CurlewApp(Gtk.Application):
 
 
 
-class DBusService(dbus.service.Object):
+class DBusService():
     def __init__(self, app, *args):
         self.app = app
-        bus_name = dbus.service.BusName('org.curlew', bus=dbus.SessionBus())
-        dbus.service.Object.__init__(self, bus_name, '/org/curlew')
+        #bus_name = dbus.service.BusName('org.curlew', bus=dbus.SessionBus())
+        #dbus.service.Object.__init__(self, bus_name, '/org/curlew')
 
-    @dbus.service.method(dbus_interface='org.curlew')
+    #@dbus.service.method(dbus_interface='org.curlew')
     
-    def present(self, *args):
-        self.app.add_files(*args)
-        self.app.present()
+    #def present(self, *args):
+        #self.app.add_files(*args)
+        #self.app.present()
 
 
 def main(*args):
-    if dbus.SessionBus().request_name("org.curlew") != \
-       dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+    if False:
         print('Curlew is already running')
         '''
         method = dbus.SessionBus().get_object("org.curlew", "/org/curlew").\
@@ -2836,7 +2838,7 @@ def main(*args):
     else:
         app = CurlewApp(*args)
         app.run()
-        DBusService(app)
+        #DBusService(app)
 
 if __name__ == '__main__':
     main(*sys.argv[1:])
